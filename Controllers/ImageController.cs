@@ -1,48 +1,33 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RestAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using RestAPI.Models;
 
-public class ImagesController : ControllerBase
+namespace RestAPI.Controllers
 {
-    [Route("api/images")]
     [ApiController]
-    public class ImageController : ControllerBase
+    [Route("api/images")]
+    public class ImagesController : ControllerBase
     {
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadImage()
+        private static List<ImageModel> _images = new List<ImageModel>();
+
+        [HttpGet]
+        public IActionResult GetImages()
         {
-            try
-            {
-                var files = Request.Form.Files;
+            return Ok(_images);
+        }
 
-                if (files == null || files.Count == 0)
-                {
-                    return BadRequest("No files were uploaded.");
-                }
-
-                var base64Images = new List<string>();
-
-                foreach (var file in files)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await file.CopyToAsync(memoryStream);
-                        var bytes = memoryStream.ToArray();
-                        var base64 = Convert.ToBase64String(bytes);
-                        base64Images.Add(base64);
-                    }
-                }
-
-                return Ok(base64Images);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex}");
-            }
+        [HttpPost]
+        public IActionResult UploadImage([FromBody] ImageModel image)
+        {
+            _images.Add(image);
+            return CreatedAtAction(nameof(GetImages), null);
         }
     }
 }
