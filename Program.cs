@@ -17,6 +17,15 @@ app.UseSwaggerUI();
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 
+bool disableCertificateValidation = builder.Configuration.GetValue<bool>("AppSettings:DisableCertificateValidation");
+
+if (disableCertificateValidation)
+{
+    // This code will only run if DisableCertificateValidation is true
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 // app.UseHttpsRedirection();
 
 app.UseAuthorization();
